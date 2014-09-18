@@ -1,0 +1,71 @@
+#!/usr/bin/env ruby
+
+require 'csv'
+require 'pry'
+
+csv_one = CSV.open(ARGV[0]).readlines
+csv_two = CSV.open(ARGV[1]).readlines
+
+# headers
+puts "Checking column headers"
+
+headers_one = csv_one[0]
+headers_two = csv_two[0]
+
+unless headers_one.count == headers_two.count
+  puts "Number of columns does not match.\nFirst CSV: #{headers_one.count} columns\nSecond CSV: #{headers_two.count} columns\n"
+  exit
+else
+  puts "Number of headers matches\n."
+end
+
+header_mismatch_found = false
+
+(0..headers_one.count).each do |header_num|
+  header_one = headers_one[header_num]
+  header_two = headers_two[header_num]
+  unless header_one == header_two
+    puts "Header difference in column [#{header_num}]. First: #{header_one}.  Second: #{header_two}.\n"
+    header_mismatch_found = true
+  end
+end
+
+if header_mismatch_found
+  puts "Aborting due to header mismatch.\n"
+  exit
+end
+
+# rows
+puts "Checking rows.\n"
+
+if csv_one.count != csv_two.count
+  puts "Number of rows does not match.\nFirst CSV: #{csv_one.count} rows\nSecond CSV: #{csv_two.count} rows\n"
+  exit
+else
+  puts "Number of rows matches.\n"
+end
+
+row_mismatch_found = false
+
+(0..csv_one.count).each do |row_num|
+  values_from_one = csv_one[row_num]
+  values_from_two = csv_two[row_num]
+  unless values_from_one == values_from_two
+    row_mismatch_found = true
+    puts "Difference on row# #{row_num}:\n"
+    (0..values_from_one.count).each do |column_num|
+      value_one = values_from_one[column_num]
+      value_two = values_from_two[column_num]
+      unless value_one == value_two
+        puts "  Column #{column_num} (#{headers_one[column_num]}):\n"
+        puts "    First: [#{value_one}]. Second: [#{value_two}]\n"
+      end
+    end
+  end
+end
+
+if row_mismatch_found
+  puts "Mismatches found.\n"
+else
+  puts "No mismatches found.\n"
+end
