@@ -46,8 +46,9 @@ else
 end
 
 row_mismatches = 0
+total_rows = csv_one.count
 
-(0..csv_one.count).each do |row_num|
+(0..total_rows).each do |row_num|
   values_from_one = csv_one[row_num]
   values_from_two = csv_two[row_num]
   unless values_from_one == values_from_two
@@ -65,7 +66,7 @@ row_mismatches = 0
 end
 
 if row_mismatches > 0
-  puts "#{row_mismatches} mismatched rows found.\n"
+  puts "#{row_mismatches} mismatched rows out of #{total_rows}.\n"
 else
-  puts "No mismatches found.\n"
+  puts "No mismatches found in #{total_rows} rows.\n"
 end
