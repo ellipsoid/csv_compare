@@ -45,13 +45,13 @@ else
   puts "Number of rows matches.\n"
 end
 
-row_mismatch_found = false
+row_mismatches = 0
 
 (0..csv_one.count).each do |row_num|
   values_from_one = csv_one[row_num]
   values_from_two = csv_two[row_num]
   unless values_from_one == values_from_two
-    row_mismatch_found = true
+    row_mismatches += 1
     puts "Difference on row# #{row_num}:\n"
     (0..values_from_one.count).each do |column_num|
       value_one = values_from_one[column_num]
@@ -64,8 +64,8 @@ row_mismatch_found = false
   end
 end
 
-if row_mismatch_found
-  puts "Mismatches found.\n"
+if row_mismatches > 0
+  puts "#{row_mismatches} mismatched rows found.\n"
 else
   puts "No mismatches found.\n"
 end
