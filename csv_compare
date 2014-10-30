@@ -3,8 +3,8 @@
 require 'csv'
 require 'pry'
 
-csv_one = CSV.open(ARGV[0]).readlines
-csv_two = CSV.open(ARGV[1]).readlines
+csv_one = CSV.open(ARGV[0], :encoding => 'ISO-8859-1').readlines
+csv_two = CSV.open(ARGV[1], :encoding => 'ISO-8859-1').readlines
 
 # headers
 puts "Checking column headers"
