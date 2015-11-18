@@ -1,4 +1,7 @@
 #!/usr/bin/env ruby
+# This script diffs two CSV files and outputs any differences. If there is a mismatch in the number 
+# of rows or columns, the script will output a corresponding message and terminate immediately.
+# Use by passing the two csvs as command line arguments. Example: `./csv_compare foo.csv bar.csv`
 
 require 'csv'
 require 'pry'
