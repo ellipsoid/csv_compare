@@ -4,39 +4,41 @@
 # Use by passing the two csvs as command line arguments. Example: `./csv_compare foo.csv bar.csv`
 
 require 'csv'
-require 'pry'
 
 csv_one = CSV.open(ARGV[0], :encoding => 'ISO-8859-1').readlines
 csv_two = CSV.open(ARGV[1], :encoding => 'ISO-8859-1').readlines
 
-# headers
-puts "Checking column headers"
+def check_headers(headers_one, headers_two)
+  # headers
+  puts "Checking column headers"
 
-headers_one = csv_one[0]
-headers_two = csv_two[0]
+  unless headers_one.count == headers_two.count
+    puts "Number of columns does not match.\nFirst CSV: #{headers_one.count} columns\nSecond CSV: #{headers_two.count} columns\n"
+    exit
+  else
+    puts "Number of headers matches\n."
+  end
 
-unless headers_one.count == headers_two.count
-  puts "Number of columns does not match.\nFirst CSV: #{headers_one.count} columns\nSecond CSV: #{headers_two.count} columns\n"
-  exit
-else
-  puts "Number of headers matches\n."
-end
+  header_mismatch_found = false
 
-header_mismatch_found = false
+  (0..headers_one.count).each do |header_num|
+    header_one = headers_one[header_num]
+    header_two = headers_two[header_num]
+    unless header_one == header_two
+      puts "Header difference in column [#{header_num}]. First: #{header_one}.  Second: #{header_two}.\n"
+      header_mismatch_found = true
+    end
+  end
 
-(0..headers_one.count).each do |header_num|
-  header_one = headers_one[header_num]
-  header_two = headers_two[header_num]
-  unless header_one == header_two
-    puts "Header difference in column [#{header_num}]. First: #{header_one}.  Second: #{header_two}.\n"
-    header_mismatch_found = true
+  if header_mismatch_found
+    puts "Aborting due to header mismatch.\n"
+    exit
   end
 end
 
-if header_mismatch_found
-  puts "Aborting due to header mismatch.\n"
-  exit
-end
+headers_one = csv_one[0]
+headers_two = csv_two[0]
+check_headers(headers_one, headers_two)
 
 # rows
 puts "Checking rows.\n"
