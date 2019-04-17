@@ -8,6 +8,7 @@
 
 require 'csv'
 
+# read both CSVs
 csv_one = CSV.open(ARGV[0], encoding: 'ISO-8859-1').readlines
 csv_two = CSV.open(ARGV[1], encoding: 'ISO-8859-1').readlines
 
@@ -29,9 +30,9 @@ else
   exit
 end
 
+# check that columns have same header values
 header_mismatch_found = false
 
-# check that columns have same header values
 (0..headers_one.count).each do |header_num|
   header_one = headers_one[header_num]
   header_two = headers_two[header_num]
@@ -65,10 +66,10 @@ else
   puts "Number of rows matches.\n"
 end
 
+# scan rows for mismatched data
 row_mismatches = 0
 total_rows = csv_one.count
 
-# scan rows for mismatched data
 (0..total_rows).each do |row_num|
   values_from_one = csv_one[row_num]
   values_from_two = csv_two[row_num]
