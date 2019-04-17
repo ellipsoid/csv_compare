@@ -1,50 +1,65 @@
 #!/usr/bin/env ruby
-# This script diffs two CSV files and outputs any differences. If there is a mismatch in the number 
-# of rows or columns, the script will output a corresponding message and terminate immediately.
-# Use by passing the two csvs as command line arguments. Example: `./csv_compare foo.csv bar.csv`
+# This script diffs two CSV files and outputs any differences. If there is a
+# mismatch in the number of rows or columns, the script will output a
+# corresponding message and terminate immediately.
+#
+# Use by passing the two csvs as command line arguments.
+# Example: `./csv_compare foo.csv bar.csv`
 
 require 'csv'
 
-csv_one = CSV.open(ARGV[0], :encoding => 'ISO-8859-1').readlines
-csv_two = CSV.open(ARGV[1], :encoding => 'ISO-8859-1').readlines
+csv_one = CSV.open(ARGV[0], encoding: 'ISO-8859-1').readlines
+csv_two = CSV.open(ARGV[1], encoding: 'ISO-8859-1').readlines
 
-def check_headers(headers_one, headers_two)
-  # headers
-  puts "Checking column headers"
-
-  unless headers_one.count == headers_two.count
-    puts "Number of columns does not match.\nFirst CSV: #{headers_one.count} columns\nSecond CSV: #{headers_two.count} columns\n"
-    exit
-  else
-    puts "Number of headers matches\n."
-  end
-
-  header_mismatch_found = false
-
-  (0..headers_one.count).each do |header_num|
-    header_one = headers_one[header_num]
-    header_two = headers_two[header_num]
-    unless header_one == header_two
-      puts "Header difference in column [#{header_num}]. First: #{header_one}.  Second: #{header_two}.\n"
-      header_mismatch_found = true
-    end
-  end
-
-  if header_mismatch_found
-    puts "Aborting due to header mismatch.\n"
-    exit
-  end
-end
+# headers
+puts 'Checking column headers'
 
 headers_one = csv_one[0]
 headers_two = csv_two[0]
-check_headers(headers_one, headers_two)
+
+# check that number of column headers match
+if headers_one.count == headers_two.count
+  puts "Number of headers matches.\n"
+else
+  puts <<-MSG
+    Number of columns does not match.
+    First CSV: #{headers_one.count} columns
+    Second CSV: #{headers_two.count} columns
+  MSG
+  exit
+end
+
+header_mismatch_found = false
+
+# check that columns have same header values
+(0..headers_one.count).each do |header_num|
+  header_one = headers_one[header_num]
+  header_two = headers_two[header_num]
+  next if header_one == header_two
+
+  puts <<-MSG
+    Header difference in column [#{header_num}].
+    First: #{header_one}.
+    Second: #{header_two}.
+  MSG
+  header_mismatch_found = true
+end
+
+if header_mismatch_found
+  puts "Aborting due to header mismatch.\n"
+  exit
+end
 
 # rows
 puts "Checking rows.\n"
 
+# report if number of rows doesn't match
 if csv_one.count != csv_two.count
-  puts "Number of rows does not match.\nFirst CSV: #{csv_one.count} rows\nSecond CSV: #{csv_two.count} rows\n"
+  puts <<-MSG
+    Number of rows does not match.
+    First CSV: #{csv_one.count} rows
+    Second CSV: #{csv_two.count} rows
+  MSG
   exit
 else
   puts "Number of rows matches.\n"
@@ -53,23 +68,32 @@ end
 row_mismatches = 0
 total_rows = csv_one.count
 
+# scan rows for mismatched data
 (0..total_rows).each do |row_num|
   values_from_one = csv_one[row_num]
   values_from_two = csv_two[row_num]
-  unless values_from_one == values_from_two
-    row_mismatches += 1
-    puts "Difference on row# #{row_num}:\n"
-    (0..values_from_one.count).each do |column_num|
-      value_one = values_from_one[column_num]
-      value_two = values_from_two[column_num]
-      unless value_one == value_two
-        puts "  Column #{column_num} (#{headers_one[column_num]}):\n"
-        puts "    First: [#{value_one}]. Second: [#{value_two}]\n"
-      end
-    end
+
+  next if values_from_one == values_from_two
+
+  row_mismatches += 1
+
+  puts "Difference on row# #{row_num}:\n"
+
+  # identify the columns that contain mis-matched data
+  (0..values_from_one.count).each do |column_num|
+    value_one = values_from_one[column_num]
+    value_two = values_from_two[column_num]
+    next if value_one == value_two
+
+    puts <<-MSG
+      Column #{column_num} (#{headers_one[column_num]}):
+      First: [#{value_one}].
+      Second: [#{value_two}].
+    MSG
   end
 end
 
+# report total number of mis-matched rows
 if row_mismatches > 0
   puts "#{row_mismatches} mismatched rows out of #{total_rows}.\n"
 else
